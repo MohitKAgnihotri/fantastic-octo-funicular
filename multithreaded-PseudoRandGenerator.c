@@ -1,7 +1,13 @@
+#define _GNU_SOURCE
+
 #include <stdio.h>
 #include <pthread.h>
 #include <sys/sysinfo.h>
 #include <malloc.h>
+#include <sched.h>
+#include <stdlib.h>
+
+cpu_set_t  mask;
 
 
 #define SINGLE_THREAD 0
@@ -81,8 +87,28 @@ void* thread_function(void *data)
     pthread_exit(0);
 }
 
+inline void assignToThisCore(int core_id)
+{
+
+}
+
 int main (int argc, char** argv)
 {
+
+    // Get the number of CPU Cores
+    unsigned int num_cpu  =  (atoi(argv[1]));
+
+    CPU_ZERO(&mask);
+    CPU_SET(num_cpu, &mask);
+
+    if (sched_setaffinity(0, sizeof(mask), &mask))
+    {
+        printf("Error: sched_setaffinity\n");
+        return -1;
+    } else
+    {
+        printf("sched_setaffinity success\n");
+    }
 
     pthread_t threadId[100] = {0};
 
